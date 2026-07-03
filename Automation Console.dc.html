@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{font-family:'Hanken Grotesk',system-ui,sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
+  :root{--bg:#F3F3F5;--panel:#FFFFFF;--panel-2:#FAFAFA;--border:#E8E8EB;--border-strong:#DADADE;--ink:#191920;--ink-2:#55555E;--muted:#8B8B95;--accent:#5B47F5;--accent-soft:rgba(91,71,245,.10);--success:#13935A;--success-soft:rgba(19,147,90,.12);--warn:#B07418;--warn-soft:rgba(176,116,24,.13);--danger:#D24039;--danger-soft:rgba(210,64,57,.11);--shadow:0 1px 2px rgba(20,20,30,.05),0 1px 3px rgba(20,20,30,.05);--radius:13px}
+  [data-theme="dark"]{--bg:#0B0B0E;--panel:#151519;--panel-2:#1A1A20;--border:#272730;--border-strong:#34343E;--ink:#F0F0F3;--ink-2:#B4B4BE;--muted:#73737E;--success:#2BAE6E;--success-soft:rgba(43,174,110,.16);--warn:#D7A23A;--warn-soft:rgba(215,162,58,.16);--danger:#E25750;--danger-soft:rgba(226,87,80,.15);--shadow:0 1px 2px rgba(0,0,0,.4),0 4px 14px rgba(0,0,0,.35)}
+  [data-accent="teal"]{--accent:#0E9E84;--accent-soft:rgba(14,158,132,.12)}
+  [data-accent="blue"]{--accent:#2D6BF0;--accent-soft:rgba(45,107,240,.12)}
+  [data-accent="violet"]{--accent:#5B47F5;--accent-soft:rgba(91,71,245,.10)}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  @keyframes slidein{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
+  @keyframes fadein{from{opacity:0}to{opacity:1}}
+  ::-webkit-scrollbar{width:11px;height:11px}
+  ::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:7px;border:3px solid var(--bg)}
+  input,button,select{font-family:inherit}
+</style>
+</helmet>
+<div data-theme="{{ theme }}" data-accent="{{ accent }}" style="display:flex;min-height:100vh;width:100%;background:var(--bg)">
+
+  <aside style="width:236px;flex:none;border-right:1px solid var(--border);background:var(--panel);display:flex;flex-direction:column;position:sticky;top:0;height:100vh">
+    <div style="padding:18px 18px 14px;display:flex;align-items:center;gap:10px">
+      <div style="width:30px;height:30px;border-radius:8px;background:var(--accent);display:flex;align-items:center;justify-content:center;flex:none;box-shadow:0 2px 8px var(--accent-soft)">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3v4M3 5h4M6 17v4M4 19h4M13 3l2.5 6.5L22 12l-6.5 2.5L13 21l-2.5-6.5L4 12l6.5-2.5z"></path></svg>
+      </div>
+      <div style="line-height:1.05">
+        <div style="font-size:14px;font-weight:700;letter-spacing:-.01em">Cadence</div>
+        <div style="font-size:10.5px;color:var(--muted);font-weight:500;letter-spacing:.02em">CONTENT AUTOPILOT</div>
+      </div>
+    </div>
+
+    <nav style="padding:6px 12px;display:flex;flex-direction:column;gap:2px">
+      <sc-for list="{{ navItems }}" as="item" hint-placeholder-count="6">
+        <button onClick="{{ item.go }}" style="{{ item.style }}" style-hover="background:var(--panel-2)">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="{{ item.iconPath }}"></path></svg>
+          <span style="flex:1">{{ item.label }}</span>
+          <sc-if value="{{ item.badge }}" hint-placeholder-val="">
+            <span style="font-size:10.5px;font-weight:700;font-family:'JetBrains Mono',monospace;background:var(--warn-soft);color:var(--warn);padding:1px 6px;border-radius:6px">{{ item.badge }}</span>
+          </sc-if>
+        </button>
+      </sc-for>
+    </nav>
+
+    <div style="margin-top:auto;padding:14px;border-top:1px solid var(--border)">
+      <div style="background:var(--panel-2);border:1px solid var(--border);border-radius:11px;padding:12px">
+        <div style="display:flex;align-items:center;gap:7px;font-size:11px;font-weight:600;color:var(--ink-2)">
+          <span style="width:7px;height:7px;border-radius:50%;background:var(--success);box-shadow:0 0 0 3px var(--success-soft)"></span>
+          Karbon · bi-weekly
+        </div>
+        <div style="font-size:12px;color:var(--muted);margin-top:5px;line-height:1.4">Next run<br><span style="color:var(--ink);font-weight:600">Mon, Jul 12 · 09:00</span></div>
+      </div>
+    </div>
+  </aside>
+
+  <main style="flex:1;min-width:0;display:flex;flex-direction:column">
+    <header style="position:sticky;top:0;z-index:20;background:color-mix(in srgb, var(--panel) 88%, transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;gap:16px">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:17px;font-weight:700;letter-spacing:-.01em;line-height:1.1">{{ screenTitle }}</div>
+        <div style="font-size:12.5px;color:var(--muted);margin-top:2px">{{ screenSub }}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:7px;font-size:12px;font-weight:500;color:var(--ink-2);background:var(--panel-2);border:1px solid var(--border);border-radius:9px;padding:6px 11px">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M2 12h20M12 2a15 15 0 0 1 0 20a15 15 0 0 1 0-20"></path></svg>
+        Health &amp; wellness · emerging markets
+      </div>
+      <button onClick="{{ onTrigger }}" style="display:flex;align-items:center;gap:8px;background:var(--accent);color:#fff;border:none;border-radius:9px;padding:9px 15px;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 2px 8px var(--accent-soft)" style-hover="filter:brightness(1.07)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"></path></svg>
+        {{ triggerLabel }}
+      </button>
+    </header>
+
+    <div style="flex:1;padding:28px;max-width:1180px;width:100%;margin:0 auto">
+
+      <!-- ================= OVERVIEW ================= -->
+      <sc-if value="{{ isDashboard }}" hint-placeholder-val="{{ true }}">
+      <div style="animation:fadein .3s">
+        <sc-if value="{{ dryRun }}" hint-placeholder-val="">
+          <div style="display:flex;align-items:center;gap:9px;background:var(--warn-soft);color:var(--warn);border:1px solid var(--warn);border-radius:11px;padding:11px 15px;font-size:13px;font-weight:600;margin-bottom:18px">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"></path></svg>
+            Dry-run mode is on — runs research &amp; generate content but publish nothing.
+          </div>
+        </sc-if>
+
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px">
+          <sc-for list="{{ metrics }}" as="m" hint-placeholder-count="4">
+            <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px">
+              <div style="font-size:12px;color:var(--muted);font-weight:600">{{ m.label }}</div>
+              <div style="font-size:27px;font-weight:800;letter-spacing:-.02em;margin-top:7px;line-height:1">{{ m.value }}</div>
+              <div style="font-size:11.5px;color:var(--success);font-weight:600;margin-top:6px">{{ m.sub }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="background:linear-gradient(110deg, var(--accent-soft), transparent 70%);border:1px solid var(--accent);border-radius:var(--radius);padding:18px 20px;display:flex;align-items:center;gap:18px;margin-bottom:22px">
+          <div style="width:40px;height:40px;border-radius:11px;background:var(--accent);flex:none;display:flex;align-items:center;justify-content:center">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6M9 15l2 2 4-4"></path></svg>
+          </div>
+          <div style="flex:1">
+            <div style="font-size:14.5px;font-weight:700">RUN-2412 finished — 4 unique pieces are waiting for review</div>
+            <div style="font-size:12.5px;color:var(--ink-2);margin-top:3px">Cold-chain gaps make probiotic supplements unviable in rural clinics · 96/100 novelty · 0 registry collisions</div>
+          </div>
+          <button onClick="{{ go.content }}" style="background:var(--accent);color:#fff;border:none;border-radius:9px;padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;flex:none" style-hover="filter:brightness(1.07)">Review content →</button>
+        </div>
+
+        <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:11px">
+          <div style="font-size:14px;font-weight:700">Run history</div>
+          <div style="font-size:12px;color:var(--muted)">Every run mines a fresh pain point — guaranteed non-duplicate</div>
+        </div>
+        <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden">
+          <div style="display:grid;grid-template-columns:104px 1fr 150px 78px 110px;gap:14px;padding:11px 18px;border-bottom:1px solid var(--border);font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">
+            <div>Run</div><div>Pain point</div><div>Status</div><div>Leads</div><div>Novelty</div>
+          </div>
+          <sc-for list="{{ runs }}" as="r" hint-placeholder-count="6">
+            <div onClick="{{ r.open }}" style="display:grid;grid-template-columns:104px 1fr 150px 78px 110px;gap:14px;padding:14px 18px;border-bottom:1px solid var(--border);align-items:center;cursor:pointer;font-size:13px" style-hover="background:var(--panel-2)">
+              <div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:var(--ink-2)">{{ r.id }}<div style="font-size:10.5px;color:var(--muted);font-weight:400;margin-top:2px">{{ r.date }}</div></div>
+              <div style="color:var(--ink);font-weight:500;line-height:1.35">{{ r.painPoint }}<div style="font-size:11px;color:var(--muted);font-weight:400;margin-top:2px">{{ r.market }}</div></div>
+              <div><span style="{{ r.badgeStyle }}"><span style="width:6px;height:6px;border-radius:50%;background:currentColor"></span>{{ r.badgeLabel }}</span></div>
+              <div style="font-family:'JetBrains Mono',monospace;font-weight:600;color:var(--ink-2)">{{ r.leadsLabel }}</div>
+              <div style="display:flex;align-items:center;gap:8px"><div style="flex:1;height:5px;border-radius:3px;background:var(--border)"><div style="height:5px;border-radius:3px;background:var(--accent);width:{{ r.noveltyPct }}"></div></div><span style="font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--muted)">{{ r.noveltyLabel }}</span></div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ================= RUN DETAIL ================= -->
+      <sc-if value="{{ isRun }}" hint-placeholder-val="">
+      <div style="animation:fadein .3s;max-width:880px">
+        <button onClick="{{ go.dashboard }}" style="display:flex;align-items:center;gap:6px;background:none;border:none;color:var(--muted);font-size:12.5px;font-weight:600;cursor:pointer;padding:0;margin-bottom:16px" style-hover="color:var(--ink)">← Run history</button>
+        <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px">
+            <span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;background:var(--panel-2);border:1px solid var(--border);padding:4px 9px;border-radius:7px">{{ currentRun.id }}</span>
+            <span style="{{ currentRun.badgeStyle }}"><span style="width:6px;height:6px;border-radius:50%;background:currentColor"></span>{{ currentRun.badgeLabel }}</span>
+            <span style="font-size:12.5px;color:var(--muted)">{{ currentRun.date }} · {{ currentRun.market }}</span>
+          </div>
+          <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Extracted pain point</div>
+          <div style="font-size:22px;font-weight:700;letter-spacing:-.01em;line-height:1.25">{{ currentRun.painPoint }}</div>
+          <div style="margin-top:16px;background:var(--panel-2);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:9px;padding:13px 15px">
+            <div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:4px">SOURCE INSIGHT</div>
+            <div style="font-size:13.5px;color:var(--ink-2);line-height:1.5">{{ currentRun.sourceInsight }}</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-top:18px">
+            <div style="border:1px solid var(--border);border-radius:10px;padding:13px"><div style="font-size:11.5px;color:var(--muted);font-weight:600">Novelty score</div><div style="font-size:21px;font-weight:800;margin-top:4px">{{ currentRun.noveltyLabel }}<span style="font-size:13px;color:var(--muted);font-weight:600">/100</span></div></div>
+            <div style="border:1px solid var(--border);border-radius:10px;padding:13px"><div style="font-size:11.5px;color:var(--muted);font-weight:600">Registry collisions</div><div style="font-size:21px;font-weight:800;margin-top:4px;color:var(--success)">0</div></div>
+            <div style="border:1px solid var(--border);border-radius:10px;padding:13px"><div style="font-size:11.5px;color:var(--muted);font-weight:600">Leads captured</div><div style="font-size:21px;font-weight:800;margin-top:4px">{{ currentRun.leadsLabel }}</div></div>
+          </div>
+          <div style="display:flex;gap:10px;margin-top:20px">
+            <button onClick="{{ go.content }}" style="background:var(--accent);color:#fff;border:none;border-radius:9px;padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer" style-hover="filter:brightness(1.07)">Review the 4 content pieces →</button>
+            <button onClick="{{ go.landing }}" style="background:var(--panel);color:var(--ink);border:1px solid var(--border-strong);border-radius:9px;padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer" style-hover="background:var(--panel-2)">View lead magnet</button>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ================= CONTENT REVIEW ================= -->
+      <sc-if value="{{ isContent }}" hint-placeholder-val="">
+      <div style="animation:fadein .3s;max-width:880px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;font-size:12.5px;color:var(--ink-2)">
+          <span style="display:inline-flex;align-items:center;gap:6px;background:var(--success-soft);color:var(--success);font-weight:600;padding:4px 10px;border-radius:8px">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>
+            All 4 pieces passed uniqueness · 0 collisions in registry of 96
+          </span>
+          <span style="color:var(--muted);font-family:'JetBrains Mono',monospace">RUN-2412</span>
+        </div>
+
+        <!-- Blog -->
+        <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;margin-bottom:16px">
+          <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:11px">
+            <div style="width:30px;height:30px;border-radius:8px;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;flex:none"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"></path></svg></div>
+            <div style="flex:1"><div style="font-size:14px;font-weight:700">Blog post</div><div style="font-size:11.5px;color:var(--muted)">{{ blog.words }} words · SEO long-form</div></div>
+            <span style="{{ blog.statusStyle }}">{{ blog.statusLabel }}</span>
+          </div>
+          <div style="padding:18px 20px">
+            <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Meta title</div>
+            <div style="font-size:15.5px;font-weight:700;margin:5px 0 12px;line-height:1.3">{{ blog.metaTitle }}</div>
+            <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Meta description</div>
+            <div style="font-size:13px;color:var(--ink-2);margin:5px 0 14px;line-height:1.5">{{ blog.metaDesc }}</div>
+            <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:7px">Section headers</div>
+            <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:14px">
+              <sc-for list="{{ blog.headers }}" as="h" hint-placeholder-count="5">
+                <div style="display:flex;gap:9px;font-size:13px;color:var(--ink);align-items:baseline"><span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--accent);font-weight:600;flex:none">H2</span>{{ h }}</div>
+              </sc-for>
+            </div>
+            <div style="white-space:pre-line;font-size:13.5px;color:var(--ink-2);line-height:1.6;border-top:1px dashed var(--border);padding-top:13px">{{ blog.excerpt }}</div>
+            <div style="margin-top:14px;background:var(--accent-soft);border-radius:9px;padding:11px 14px;font-size:13px;font-weight:600;color:var(--accent);display:flex;align-items:center;gap:8px"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"></path></svg>{{ blog.cta }}</div>
+            <div style="display:flex;align-items:center;gap:14px;margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+              <div style="display:flex;align-items:center;gap:7px;font-size:11.5px;font-family:'JetBrains Mono',monospace;color:var(--muted)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2"><path d="M20 6 9 17l-5-5"></path></svg>hash {{ blog.hash }}</div>
+              <div style="font-size:11.5px;color:var(--muted)">TF-IDF similarity to nearest: <b style="color:var(--success);font-family:'JetBrains Mono',monospace">{{ blog.sim }}</b></div>
+              <div style="margin-left:auto;display:flex;gap:8px">
+                <button onClick="{{ blog.reject }}" style="background:var(--panel);border:1px solid var(--border-strong);color:var(--ink-2);border-radius:8px;padding:7px 13px;font-size:12.5px;font-weight:600;cursor:pointer" style-hover="border-color:var(--danger);color:var(--danger)">Regenerate</button>
+                <button onClick="{{ blog.approve }}" style="background:var(--success);border:none;color:#fff;border-radius:8px;padding:7px 14px;font-size:12.5px;font-weight:600;cursor:pointer" style-hover="filter:brightness(1.07)">Approve</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Social trio -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <sc-for list="{{ socials }}" as="s" hint-placeholder-count="3">
+            <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column">
+              <div style="padding:13px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:9px">
+                <div style="width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex:none;background:{{ s.iconBg }};color:#fff"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="{{ s.iconPath }}"></path></svg></div>
+                <div style="flex:1;font-size:13px;font-weight:700">{{ s.name }}</div>
+                <span style="{{ s.statusStyle }}">{{ s.statusLabel }}</span>
+              </div>
+              <div style="padding:15px 16px;flex:1;display:flex;flex-direction:column">
+                <div style="white-space:pre-line;font-size:13px;color:var(--ink);line-height:1.55;flex:1">{{ s.text }}</div>
+                <sc-if value="{{ s.tags }}" hint-placeholder-val="">
+                  <div style="font-size:12px;color:var(--accent);font-weight:600;margin-top:9px;line-height:1.5">{{ s.tags }}</div>
+                </sc-if>
+                <div style="display:flex;align-items:center;gap:10px;margin-top:13px;padding-top:12px;border-top:1px solid var(--border)">
+                  <div style="font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--muted)">sim {{ s.sim }}</div>
+                  <div style="margin-left:auto;display:flex;gap:7px">
+                    <button onClick="{{ s.reject }}" style="background:var(--panel);border:1px solid var(--border-strong);color:var(--ink-2);border-radius:7px;padding:6px 11px;font-size:12px;font-weight:600;cursor:pointer" style-hover="border-color:var(--danger);color:var(--danger)">Redo</button>
+                    <button onClick="{{ s.approve }}" style="background:var(--success);border:none;color:#fff;border-radius:7px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer" style-hover="filter:brightness(1.07)">Approve</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:12px;margin-top:20px;background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:15px 20px">
+          <div style="flex:1;font-size:13px;color:var(--ink-2)"><b style="color:var(--ink)">{{ approvedCount }} of 4 approved.</b> Approving locks each piece into the registry so it can never be regenerated or repeated.</div>
+          <button onClick="{{ onApproveAll }}" style="background:var(--accent);color:#fff;border:none;border-radius:9px;padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;flex:none" style-hover="filter:brightness(1.07)">Approve all &amp; queue</button>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ================= LANDING PAGE ================= -->
+      <sc-if value="{{ isLanding }}" hint-placeholder-val="">
+      <div style="animation:fadein .3s">
+        <div style="display:flex;align-items:center;gap:9px;margin-bottom:16px;font-size:12.5px;color:var(--muted)">
+          <span style="font-family:'JetBrains Mono',monospace;background:var(--panel-2);border:1px solid var(--border);padding:4px 9px;border-radius:7px">cadence.io/lead-magnet/cold-chain-probiotics-2412</span>
+          <span style="display:inline-flex;align-items:center;gap:6px;color:var(--success);font-weight:600"><span style="width:6px;height:6px;border-radius:50%;background:var(--success)"></span>Live preview</span>
+        </div>
+        <div style="background:var(--panel);border:1px solid var(--border);border-radius:18px;box-shadow:0 16px 40px rgba(20,20,30,.10);overflow:hidden;max-width:960px;margin:0 auto">
+          <div style="display:grid;grid-template-columns:1.1fr .9fr">
+            <div style="padding:46px 44px;background:linear-gradient(155deg, var(--accent-soft), transparent 60%)">
+              <div style="display:inline-flex;align-items:center;gap:7px;font-size:11.5px;font-weight:700;color:var(--accent);background:var(--panel);border:1px solid var(--accent);padding:5px 11px;border-radius:999px;letter-spacing:.02em">FREE FIELD GUIDE</div>
+              <h1 style="font-size:32px;font-weight:800;letter-spacing:-.02em;line-height:1.12;margin:18px 0 0">5 Ways to Deliver Probiotics Without a Cold Chain</h1>
+              <p style="font-size:15px;color:var(--ink-2);line-height:1.55;margin:14px 0 0">A field-tested playbook for wellness brands and clinics where refrigeration loss kills more than 40% of stock before the last mile.</p>
+              <div style="display:flex;flex-direction:column;gap:10px;margin-top:22px">
+                <div style="display:flex;gap:9px;font-size:13.5px;color:var(--ink);align-items:center"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>3 shelf-stable formats that survive transit</div>
+                <div style="display:flex;gap:9px;font-size:13.5px;color:var(--ink);align-items:center"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>The one viability metric most teams miss</div>
+                <div style="display:flex;gap:9px;font-size:13.5px;color:var(--ink);align-items:center"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>A printable cold-chain readiness checklist</div>
+              </div>
+            </div>
+            <div style="padding:40px 36px;border-left:1px solid var(--border);display:flex;flex-direction:column;justify-content:center">
+              <sc-if value="{{ formDone }}" hint-placeholder-val="">
+                <div style="text-align:center;animation:slidein .3s">
+                  <div style="width:54px;height:54px;border-radius:50%;background:var(--success-soft);color:var(--success);display:flex;align-items:center;justify-content:center;margin:0 auto 14px"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg></div>
+                  <div style="font-size:17px;font-weight:700">You're in — check your inbox</div>
+                  <div style="font-size:13px;color:var(--ink-2);margin-top:6px;line-height:1.5">Contact synced to ActiveCampaign and the 3-email sequence just kicked off.</div>
+                  <button onClick="{{ go.leads }}" style="margin-top:16px;background:var(--panel);border:1px solid var(--border-strong);color:var(--ink);border-radius:9px;padding:9px 15px;font-size:13px;font-weight:600;cursor:pointer" style-hover="background:var(--panel-2)">See it in Leads →</button>
+                </div>
+              </sc-if>
+              <sc-if value="{{ formOpen }}" hint-placeholder-val="{{ true }}">
+                <div>
+                  <div style="font-size:15px;font-weight:700;margin-bottom:4px">Get the free guide</div>
+                  <div style="font-size:12.5px;color:var(--muted);margin-bottom:16px">No spam. Unsubscribe anytime.</div>
+                  <label style="font-size:12px;font-weight:600;color:var(--ink-2)">Name</label>
+                  <input value="{{ formName }}" onInput="{{ onFormName }}" placeholder="Amara Okeke" style="width:100%;margin:6px 0 13px;padding:11px 13px;border:1px solid var(--border-strong);border-radius:9px;font-size:13.5px;background:var(--panel-2);color:var(--ink);outline:none">
+                  <label style="font-size:12px;font-weight:600;color:var(--ink-2)">Work email</label>
+                  <input value="{{ formEmail }}" onInput="{{ onFormEmail }}" placeholder="you@clinic.org" style="width:100%;margin:6px 0 6px;padding:11px 13px;border:1px solid var(--border-strong);border-radius:9px;font-size:13.5px;background:var(--panel-2);color:var(--ink);outline:none">
+                  <sc-if value="{{ formError }}" hint-placeholder-val="">
+                    <div style="font-size:12px;color:var(--danger);font-weight:600;margin-bottom:8px">{{ formError }}</div>
+                  </sc-if>
+                  <button onClick="{{ onSubmit }}" style="width:100%;margin-top:8px;background:var(--accent);color:#fff;border:none;border-radius:9px;padding:12px;font-size:14px;font-weight:700;cursor:pointer" style-hover="filter:brightness(1.07)">Download the guide</button>
+                  <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:11px">→ creates a contact in ActiveCampaign (list #14)</div>
+                </div>
+              </sc-if>
+            </div>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ================= LEADS ================= -->
+      <sc-if value="{{ isLeads }}" hint-placeholder-val="">
+      <div style="animation:fadein .3s">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+          <div style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink-2);background:var(--panel);border:1px solid var(--border);border-radius:9px;padding:7px 12px"><span style="width:7px;height:7px;border-radius:50%;background:var(--success)"></span>ActiveCampaign · list #14 · synced live</div>
+          <div style="font-size:12.5px;color:var(--muted)">{{ leadCountLabel }} contacts captured</div>
+        </div>
+        <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden">
+          <div style="display:grid;grid-template-columns:1.3fr 1.6fr 1.2fr 110px 100px;gap:14px;padding:11px 18px;border-bottom:1px solid var(--border);font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">
+            <div>Contact</div><div>Email</div><div>Pain point</div><div>Source</div><div>Sync</div>
+          </div>
+          <sc-for list="{{ leads }}" as="l" hint-placeholder-count="5">
+            <div style="display:grid;grid-template-columns:1.3fr 1.6fr 1.2fr 110px 100px;gap:14px;padding:13px 18px;border-bottom:1px solid var(--border);align-items:center;font-size:13px" style-hover="background:var(--panel-2)">
+              <div style="display:flex;align-items:center;gap:9px"><div style="width:28px;height:28px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:700;flex:none">{{ l.initials }}</div><span style="font-weight:600">{{ l.name }}</span></div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink-2)">{{ l.email }}</div>
+              <div style="color:var(--ink-2)">{{ l.pain }}</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--muted)">{{ l.source }}</div>
+              <div><span style="{{ l.badgeStyle }}">{{ l.badgeLabel }}</span></div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ================= CAMPAIGN ================= -->
+      <sc-if value="{{ isCampaign }}" hint-placeholder-val="">
+      <div style="animation:fadein .3s;max-width:820px">
+        <div style="display:flex;align-items:center;gap:11px;background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:15px 18px;margin-bottom:18px">
+          <div style="width:34px;height:34px;border-radius:9px;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;flex:none"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"></path><path d="M22 6 12 13 2 6"></path></svg></div>
+          <div style="flex:1"><div style="font-size:14px;font-weight:700">3-email nurture sequence · draft</div><div style="font-size:12.5px;color:var(--muted)">Auto-drafted from the RUN-2412 pain point · sends on opt-in</div></div>
+          <span style="display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;background:var(--warn-soft);color:var(--warn);padding:5px 11px;border-radius:999px">Draft</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <sc-for list="{{ emails }}" as="e" hint-placeholder-count="3">
+            <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden">
+              <div style="display:flex;align-items:center;gap:13px;padding:15px 20px;border-bottom:1px solid var(--border)">
+                <div style="width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex:none">{{ e.n }}</div>
+                <div style="flex:1"><div style="font-size:14px;font-weight:700">{{ e.subject }}</div><div style="font-size:12px;color:var(--muted);margin-top:2px">{{ e.goal }} · {{ e.timing }}</div></div>
+              </div>
+              <div style="padding:15px 20px">
+                <div style="font-size:12.5px;color:var(--muted);font-style:italic;margin-bottom:9px">Preview: {{ e.preview }}</div>
+                <div style="white-space:pre-line;font-size:13.5px;color:var(--ink-2);line-height:1.6">{{ e.body }}</div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:18px">
+          <button onClick="{{ onApproveSeq }}" style="background:var(--accent);color:#fff;border:none;border-radius:9px;padding:11px 18px;font-size:13.5px;font-weight:600;cursor:pointer" style-hover="filter:brightness(1.07)">Approve sequence</button>
+          <button style="background:var(--panel);color:var(--ink);border:1px solid var(--border-strong);border-radius:9px;padding:11px 18px;font-size:13.5px;font-weight:600;cursor:pointer" style-hover="background:var(--panel-2)">Edit in ActiveCampaign</button>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ================= SETTINGS ================= -->
+      <sc-if value="{{ isSettings }}" hint-placeholder-val="">
+      <div style="animation:fadein .3s;max-width:760px;display:flex;flex-direction:column;gap:18px">
+
+        <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px">
+          <div style="font-size:14px;font-weight:700;margin-bottom:3px">Schedule &amp; trigger</div>
+          <div style="font-size:12.5px;color:var(--muted);margin-bottom:16px">Point a Karbon work item at this webhook on a bi-weekly cadence.</div>
+          <label style="font-size:12px;font-weight:600;color:var(--ink-2)">Webhook URL</label>
+          <div style="display:flex;gap:8px;margin-top:6px">
+            <input readonly value="{{ webhookUrl }}" style="flex:1;padding:10px 13px;border:1px solid var(--border-strong);border-radius:9px;font-size:12.5px;font-family:'JetBrains Mono',monospace;background:var(--panel-2);color:var(--ink-2);outline:none">
+            <button onClick="{{ onCopyWebhook }}" style="background:var(--accent);color:#fff;border:none;border-radius:9px;padding:0 16px;font-size:12.5px;font-weight:600;cursor:pointer;flex:none" style-hover="filter:brightness(1.07)">Copy</button>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px">
+            <div><label style="font-size:12px;font-weight:600;color:var(--ink-2)">Cadence</label><input defaultValue="Every 2 weeks · Mon 09:00 UTC" style="width:100%;margin-top:6px;padding:10px 13px;border:1px solid var(--border-strong);border-radius:9px;font-size:13px;background:var(--panel-2);color:var(--ink);outline:none"></div>
+            <div><label style="font-size:12px;font-weight:600;color:var(--ink-2)">Target market</label><input defaultValue="Health &amp; wellness · underdeveloped" style="width:100%;margin-top:6px;padding:10px 13px;border:1px solid var(--border-strong);border-radius:9px;font-size:13px;background:var(--panel-2);color:var(--ink);outline:none"></div>
+          </div>
+        </div>
+
+        <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px">
+          <div style="font-size:14px;font-weight:700;margin-bottom:16px">Research &amp; generation</div>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div><label style="font-size:12px;font-weight:600;color:var(--ink-2)">Search API key (SerpAPI)</label><input type="password" defaultValue="serp_live_8f3a••••••••••••" style="width:100%;margin-top:6px;padding:10px 13px;border:1px solid var(--border-strong);border-radius:9px;font-size:13px;font-family:'JetBrains Mono',monospace;background:var(--panel-2);color:var(--ink-2);outline:none"></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+              <div><label style="font-size:12px;font-weight:600;color:var(--ink-2)">LLM provider</label><input defaultValue="Claude · claude-sonnet" style="width:100%;margin-top:6px;padding:10px 13px;border:1px solid var(--border-strong);border-radius:9px;font-size:13px;background:var(--panel-2);color:var(--ink);outline:none"></div>
+              <div><label style="font-size:12px;font-weight:600;color:var(--ink-2)">Uniqueness threshold</label><input defaultValue="cosine ≤ 0.30" style="width:100%;margin-top:6px;padding:10px 13px;border:1px solid var(--border-strong);border-radius:9px;font-size:13px;font-family:'JetBrains Mono',monospace;background:var(--panel-2);color:var(--ink-2);outline:none"></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px">
+          <div style="font-size:14px;font-weight:700;margin-bottom:3px">ActiveCampaign</div>
+          <div style="font-size:12.5px;color:var(--muted);margin-bottom:16px">Where captured leads and email drafts are pushed.</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+            <div><label style="font-size:12px;font-weight:600;color:var(--ink-2)">API URL</label><input defaultValue="https://acme.api-us1.com" style="width:100%;margin-top:6px;padding:10px 13px;border:1px solid var(--border-strong);border-radius:9px;font-size:13px;font-family:'JetBrains Mono',monospace;background:var(--panel-2);color:var(--ink-2);outline:none"></div>
+            <div><label style="font-size:12px;font-weight:600;color:var(--ink-2)">List ID</label><input defaultValue="14" style="width:100%;margin-top:6px;padding:10px 13px;border:1px solid var(--border-strong);border-radius:9px;font-size:13px;font-family:'JetBrains Mono',monospace;background:var(--panel-2);color:var(--ink-2);outline:none"></div>
+          </div>
+        </div>
+
+        <div style="background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px">
+          <div style="font-size:14px;font-weight:700;margin-bottom:3px">Distribution channels</div>
+          <div style="font-size:12.5px;color:var(--muted);margin-bottom:14px">Connected channels publish live. Stubs log to console until credentials are added.</div>
+          <div style="display:flex;flex-direction:column;gap:9px">
+            <sc-for list="{{ channels }}" as="c" hint-placeholder-count="4">
+              <div style="display:flex;align-items:center;gap:12px;border:1px solid var(--border);border-radius:10px;padding:12px 14px">
+                <div style="width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex:none;background:{{ c.iconBg }};color:#fff"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="{{ c.iconPath }}"></path></svg></div>
+                <div style="flex:1"><div style="font-size:13.5px;font-weight:600">{{ c.name }}</div><div style="font-size:11.5px;color:var(--muted)">{{ c.detail }}</div></div>
+                <span style="{{ c.badgeStyle }}">{{ c.badgeLabel }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+      </div>
+      </sc-if>
+
+    </div>
+  </main>
+
+  <!-- RUN OVERLAY -->
+  <sc-if value="{{ running }}" hint-placeholder-val="">
+    <div style="position:fixed;inset:0;z-index:80;background:rgba(10,10,14,.42);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;animation:fadein .2s">
+      <div style="background:var(--panel);border:1px solid var(--border);border-radius:18px;box-shadow:0 24px 60px rgba(0,0,0,.3);padding:28px 30px;width:430px;animation:slidein .25s">
+        <div style="display:flex;align-items:center;gap:11px;margin-bottom:20px">
+          <div style="width:34px;height:34px;border-radius:9px;background:var(--accent-soft);display:flex;align-items:center;justify-content:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:spin 1.4s linear infinite"><path d="M21 12a9 9 0 1 1-6.2-8.5"></path></svg></div>
+          <div><div style="font-size:15px;font-weight:700">{{ runTitle }}</div><div style="font-size:12px;color:var(--muted)">RUN-2413 · {{ runMarket }}</div></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:3px">
+          <sc-for list="{{ runSteps }}" as="st" hint-placeholder-count="5">
+            <div style="display:flex;align-items:center;gap:12px;padding:9px 4px">
+              <div style="{{ st.dotStyle }}">
+                <sc-if value="{{ st.isDone }}" hint-placeholder-val=""><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg></sc-if>
+                <sc-if value="{{ st.isActive }}" hint-placeholder-val=""><span style="width:8px;height:8px;border-radius:50%;background:#fff;animation:pulse 1s infinite"></span></sc-if>
+              </div>
+              <span style="{{ st.labelStyle }}">{{ st.label }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- TOAST -->
+  <sc-if value="{{ toast }}" hint-placeholder-val="">
+    <div style="position:fixed;bottom:22px;right:22px;z-index:90;animation:slidein .25s">
+      <div style="display:flex;align-items:center;gap:11px;background:var(--panel);border:1px solid var(--border-strong);border-left:3px solid {{ toast.accent }};border-radius:11px;box-shadow:0 10px 30px rgba(0,0,0,.18);padding:13px 17px;max-width:380px">
+        <div style="width:22px;height:22px;border-radius:50%;background:{{ toast.accent }};display:flex;align-items:center;justify-content:center;flex:none"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg></div>
+        <span style="font-size:13px;font-weight:600;color:var(--ink)">{{ toast.msg }}</span>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;100%&quot;,&quot;height&quot;:&quot;100%&quot;},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;dark&quot;],&quot;default&quot;:&quot;light&quot;,&quot;tsType&quot;:&quot;\&quot;light\&quot;|\&quot;dark\&quot;&quot;,&quot;section&quot;:&quot;Appearance&quot;},&quot;accent&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;violet&quot;,&quot;teal&quot;,&quot;blue&quot;],&quot;default&quot;:&quot;violet&quot;,&quot;tsType&quot;:&quot;\&quot;violet\&quot;|\&quot;teal\&quot;|\&quot;blue\&quot;&quot;,&quot;section&quot;:&quot;Appearance&quot;},&quot;dryRun&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Behavior&quot;}}">
+class Component extends DCLogic {
+  state = {
+    screen: 'dashboard',
+    selectedRun: 'RUN-2412',
+    running: false,
+    runStep: -1,
+    cstatus: { blog: 'pending', linkedin: 'pending', facebook: 'pending', instagram: 'pending' },
+    form: { name: '', email: '' },
+    formError: '',
+    formDone: false,
+    toast: null,
+    extraLeads: [],
+  };
+
+  STEP_LABELS = ['Searching recent sources', 'Extracting a unique pain point', 'Generating SEO + social content', 'Checking the uniqueness registry', 'Ready for review'];
+
+  // ---- data ----
+  baseRuns() {
+    return [
+      { id: 'RUN-2412', date: 'Jun 28, 2026', status: 'review', market: 'Sub-Saharan Africa', painPoint: 'Cold-chain gaps make probiotic supplements unviable in rural clinics', sourceInsight: 'Three of five sampled regional distributors report losing more than 40% of refrigeration-dependent stock before last-mile delivery (WHO logistics brief, May 2026).', leads: 0, novelty: 96 },
+      { id: 'RUN-2411', date: 'Jun 14, 2026', status: 'published', market: 'Southeast Asia', painPoint: 'Out-of-pocket micronutrient cost outpaces the rural daily wage', sourceInsight: 'A 30-day iron-folate course averages 1.8x the median rural daily wage across four ASEAN provinces.', leads: 34, novelty: 91 },
+      { id: 'RUN-2410', date: 'May 31, 2026', status: 'published', market: 'South Asia', painPoint: 'Tier-2 cities lack localized youth mental-health resources', sourceInsight: 'Only one vernacular-language tele-counselling service per 2.1M residents across surveyed tier-2 districts.', leads: 51, novelty: 88 },
+      { id: 'RUN-2409', date: 'May 17, 2026', status: 'published', market: 'Latin America', painPoint: 'Counterfeit vitamins erode trust in online wellness purchases', sourceInsight: 'Marketplace audits flagged roughly one in six listings as likely counterfeit across three countries.', leads: 42, novelty: 84 },
+      { id: 'RUN-2408', date: 'May 3, 2026', status: 'published', market: 'East Africa', painPoint: 'Maternal nutrition gaps persist in rural prenatal clinics', sourceInsight: '62% of surveyed rural clinics report no structured prenatal supplement counselling.', leads: 38, novelty: 90 },
+      { id: 'RUN-2407', date: 'Apr 19, 2026', status: 'failed', market: 'Sub-Saharan Africa', painPoint: 'Research step failed after 3 retries', sourceInsight: 'SerpAPI returned 429 (rate limit) on all attempts. Run marked failed; admin notified.', leads: 0, novelty: 0 },
+    ];
+  }
+
+  STATUS = {
+    review: { label: 'Needs review', fg: 'var(--warn)', bg: 'var(--warn-soft)' },
+    published: { label: 'Published', fg: 'var(--success)', bg: 'var(--success-soft)' },
+    running: { label: 'Running', fg: 'var(--accent)', bg: 'var(--accent-soft)' },
+    failed: { label: 'Failed', fg: 'var(--danger)', bg: 'var(--danger-soft)' },
+    synced: { label: 'Synced', fg: 'var(--success)', bg: 'var(--success-soft)' },
+    pending: { label: 'Pending', fg: 'var(--warn)', bg: 'var(--warn-soft)' },
+  };
+
+  badge(key) {
+    const s = this.STATUS[key] || this.STATUS.pending;
+    return `display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:600;background:${s.bg};color:${s.fg};white-space:nowrap`;
+  }
+
+  pieceStatus(s) {
+    if (s === 'approved') return { statusLabel: 'Approved', statusStyle: this.badge('synced') };
+    if (s === 'rejected') return { statusLabel: 'Regenerating…', statusStyle: this.badge('failed') };
+    return { statusLabel: 'Pending', statusStyle: this.badge('pending') };
+  }
+
+  setStatus(key, val) { this.setState(s => ({ cstatus: { ...s.cstatus, [key]: val } })); }
+
+  go(screen) { return () => this.setState({ screen }); }
+  openRun(id) { this.setState({ selectedRun: id, screen: 'run' }); }
+
+  triggerRun() {
+    if (this.state.running) return;
+    const dry = this.props.dryRun;
+    this.setState({ running: true, runStep: 0 });
+    let step = 0;
+    this._t = setInterval(() => {
+      step++;
+      if (step <= 4) { this.setState({ runStep: step }); }
+      if (step > 4) {
+        clearInterval(this._t);
+        setTimeout(() => {
+          this.setState({ running: false, runStep: -1 });
+          this.flash(dry
+            ? 'Dry run complete — 1 unique pain point found, nothing published.'
+            : 'RUN-2413 complete · 4 unique pieces ready for review');
+        }, 650);
+      }
+    }, 950);
+  }
+
+  flash(msg) {
+    this.setState({ toast: { msg, accent: 'var(--success)' } });
+    clearTimeout(this._toastT);
+    this._toastT = setTimeout(() => this.setState({ toast: null }), 3800);
+  }
+
+  onFormName(e) { const v = e.target.value; this.setState(s => ({ form: { ...s.form, name: v }, formError: '' })); }
+  onFormEmail(e) { const v = e.target.value; this.setState(s => ({ form: { ...s.form, email: v }, formError: '' })); }
+
+  submitForm() {
+    const { name, email } = this.state.form;
+    if (!name.trim()) return this.setState({ formError: 'Please enter your name.' });
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return this.setState({ formError: 'Enter a valid email address.' });
+    const initials = name.trim().split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase();
+    const lead = { name: name.trim(), email: email.trim(), pain: 'Cold-chain probiotics', source: 'RUN-2412', status: 'synced', date: 'Today', initials };
+    this.setState(s => ({ extraLeads: [lead, ...s.extraLeads], formDone: true, form: { name: '', email: '' } }));
+    this.flash('Contact synced to ActiveCampaign · sequence started');
+  }
+
+  copyWebhook() {
+    try { navigator.clipboard.writeText('https://api.cadence.io/hooks/run/2f9a-bi-weekly'); } catch (e) {}
+    this.flash('Webhook URL copied to clipboard');
+  }
+
+  componentWillUnmount() { clearInterval(this._t); clearTimeout(this._toastT); }
+
+  renderVals() {
+    const screen = this.state.screen;
+    const theme = this.props.theme || 'light';
+    const accent = this.props.accent || 'violet';
+    const dryRun = !!this.props.dryRun;
+
+    const navDef = [
+      { key: 'dashboard', label: 'Overview', iconPath: 'M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z', badge: '' },
+      { key: 'content', label: 'Content review', iconPath: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M16 13H8M16 17H8M10 9H8', badge: '4' },
+      { key: 'landing', label: 'Lead magnet', iconPath: 'M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3', badge: '' },
+      { key: 'leads', label: 'Leads', iconPath: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8', badge: '' },
+      { key: 'campaign', label: 'Campaigns', iconPath: 'M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM22 6 12 13 2 6', badge: '' },
+      { key: 'settings', label: 'Settings', iconPath: 'M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6', badge: '' },
+    ];
+    const activeKey = screen === 'run' ? 'dashboard' : screen;
+    const navBase = 'display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:9px;font-size:13.5px;font-weight:500;cursor:pointer;border:none;width:100%;text-align:left;font-family:inherit;transition:background .12s';
+    const navItems = navDef.map(n => ({
+      label: n.label, iconPath: n.iconPath, badge: n.badge,
+      go: this.go(n.key),
+      style: n.key === activeKey ? navBase + ';background:var(--accent-soft);color:var(--accent)' : navBase + ';background:transparent;color:var(--ink-2)',
+    }));
+
+    const titles = {
+      dashboard: ['Overview', 'Bi-weekly content engine for emerging health & wellness markets'],
+      run: ['Run detail', 'Research output and pipeline status'],
+      content: ['Content review', 'Approve unique pieces before they enter the registry'],
+      landing: ['Lead magnet', 'Landing page generated for this run'],
+      leads: ['Leads', 'Contacts captured and pushed to ActiveCampaign'],
+      campaign: ['Campaigns', 'Auto-drafted nurture sequences'],
+      settings: ['Settings', 'APIs, schedule and distribution channels'],
+    };
+    const t = titles[screen] || titles.dashboard;
+
+    const runs = this.baseRuns().map(r => ({
+      ...r,
+      badgeStyle: this.badge(r.status),
+      badgeLabel: this.STATUS[r.status].label,
+      leadsLabel: r.status === 'failed' ? '—' : String(r.leads),
+      noveltyLabel: r.novelty ? String(r.novelty) : '—',
+      noveltyPct: (r.novelty || 0) + '%',
+      open: () => this.openRun(r.id),
+    }));
+    const currentRun = runs.find(r => r.id === this.state.selectedRun) || runs[0];
+
+    const metrics = [
+      { label: 'Runs completed', value: '24', sub: '+1 this cycle' },
+      { label: 'Leads captured', value: '318', sub: '+34 last run' },
+      { label: 'Content pieces', value: '96', sub: '4 per run' },
+      { label: 'Uniqueness rate', value: '100%', sub: '0 duplicates ever' },
+    ];
+
+    // content
+    const blog = {
+      words: '1,184',
+      metaTitle: "Cold-Chain Gaps & Probiotics: Why Rural Clinics Can't Stock What Patients Need",
+      metaDesc: 'Refrigeration loss kills probiotic viability before the last mile. Five field-tested ways wellness brands can reach rural clinics without a cold chain.',
+      headers: ['The hidden cost of a broken cold chain', 'What rural clinics actually face on the ground', 'Three shelf-stable formats that survive transit', 'Building demand without refrigeration', 'What this means for wellness brands'],
+      excerpt: "In much of rural Sub-Saharan Africa, a probiotic capsule's journey ends long before it reaches a patient. Distributors sampled for this piece reported losing more than 40% of cold-chain-dependent stock to refrigeration failure before last-mile delivery — a number that quietly reshapes which products a clinic can even consider stocking.\n\nThe usual response is to buy more freezers. But for clinics running on intermittent power, that's a non-starter. The more durable answer is to design the product, and the demand around it, to fit the constraint rather than fight it.",
+      cta: 'Free guide: 5 Ways to Deliver Probiotics Without a Cold Chain',
+      hash: 'a7f3c1·91c4', sim: '0.09',
+      ...this.pieceStatus(this.state.cstatus.blog),
+      approve: () => this.setStatus('blog', 'approved'),
+      reject: () => this.setStatus('blog', 'rejected'),
+    };
+
+    const socialDefs = [
+      { key: 'linkedin', name: 'LinkedIn', iconBg: '#0A66C2', iconPath: 'M6.94 5a2 2 0 1 1-4-.02 2 2 0 0 1 4 .02zM7 8.48H3V21h4zM14.32 8.48a4.16 4.16 0 0 0-3.65 1.84V8.48H7V21h4v-6.6c0-1.5.28-3 2.15-3s1.85 1.74 1.85 3.05V21h4v-7.2c0-3.5-.74-5.32-4.68-5.32z', sim: '0.07',
+        text: "40% of probiotic stock is lost before it reaches a rural clinic — to refrigeration failure, not demand.\n\nWe spent the last cycle with distributors across Sub-Saharan Africa. The pattern was consistent: cold-chain dependence, not affordability, is the real ceiling on access.\n\nThe fix isn't more freezers. It's product and demand designed around the constraint. We've put the 5 approaches that actually held up into a free field guide. 👇" },
+      { key: 'facebook', name: 'Facebook', iconBg: '#1877F2', iconPath: 'M24 12a12 12 0 1 0-13.9 11.9v-8.4H7v-3.5h3.1V9.4c0-3 1.8-4.7 4.5-4.7 1.3 0 2.7.24 2.7.24v3h-1.5c-1.5 0-2 .93-2 1.9v2.2h3.4l-.55 3.5h-2.9v8.4A12 12 0 0 0 24 12z', sim: '0.11',
+        text: "Ever wonder why your local clinic can't keep certain supplements in stock? It's often not price — it's the fridge. 🧊\n\nWe dug into why probiotics don't survive the trip to rural clinics, and what actually works instead. Grab the free guide — link below." },
+      { key: 'instagram', name: 'Instagram', iconBg: 'linear-gradient(45deg,#F58529,#DD2A7B,#8134AF)', iconPath: 'M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.7 3.7 0 0 1-1.38-.9 3.7 3.7 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16zM12 0C8.74 0 8.33.01 7.05.07 5.78.13 4.9.33 4.14.63a5.9 5.9 0 0 0-2.13 1.38A5.9 5.9 0 0 0 .63 4.14C.33 4.9.13 5.78.07 7.05.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.06 1.27.26 2.15.56 2.91.3.79.72 1.46 1.38 2.13.67.66 1.34 1.08 2.13 1.38.76.3 1.64.5 2.91.56C8.33 23.99 8.74 24 12 24s3.67-.01 4.95-.07c1.27-.06 2.15-.26 2.91-.56a5.9 5.9 0 0 0 2.13-1.38 5.9 5.9 0 0 0 1.38-2.13c.3-.76.5-1.64.56-2.91.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.06-1.27-.26-2.15-.56-2.91a5.9 5.9 0 0 0-1.38-2.13A5.9 5.9 0 0 0 19.86.63c-.76-.3-1.64-.5-2.91-.56C15.67.01 15.26 0 12 0zm0 5.84a6.16 6.16 0 1 0 0 12.32 6.16 6.16 0 0 0 0-12.32zm0 10.16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm7.85-10.4a1.44 1.44 0 1 1-2.88 0 1.44 1.44 0 0 1 2.88 0z', sim: '0.08',
+        text: "Not a price problem. A fridge problem. 🧊\n\nWhy probiotics don't make it to rural clinics — and the 5 fixes that do. Free guide in bio.",
+        tags: '#wellnessaccess #globalhealth #supplements #coldchain #publichealth' },
+    ];
+    const socials = socialDefs.map(s => ({
+      name: s.name, iconBg: s.iconBg, iconPath: s.iconPath, sim: s.sim, text: s.text, tags: s.tags || '',
+      ...this.pieceStatus(this.state.cstatus[s.key]),
+      approve: () => this.setStatus(s.key, 'approved'),
+      reject: () => this.setStatus(s.key, 'rejected'),
+    }));
+    const approvedCount = Object.values(this.state.cstatus).filter(v => v === 'approved').length;
+
+    // leads
+    const baseLeads = [
+      { name: 'Amara Okeke', email: 'a.okeke@clinicmail.com', source: 'RUN-2411', pain: 'Micronutrient cost', status: 'synced', date: 'Jun 27' },
+      { name: 'Daniel Mwangi', email: 'd.mwangi@healthco.io', source: 'RUN-2411', pain: 'Micronutrient cost', status: 'synced', date: 'Jun 26' },
+      { name: 'Priya Nair', email: 'priya.nair@wellbeing.in', source: 'RUN-2410', pain: 'Youth mental health', status: 'synced', date: 'Jun 22' },
+      { name: 'Luisa Romero', email: 'l.romero@wellmail.com', source: 'RUN-2409', pain: 'Counterfeit vitamins', status: 'pending', date: 'Jun 20' },
+      { name: 'Kwame Asante', email: 'k.asante@clinic.org', source: 'RUN-2408', pain: 'Maternal nutrition', status: 'synced', date: 'Jun 18' },
+    ];
+    const leads = [...this.state.extraLeads, ...baseLeads].map(l => ({
+      ...l,
+      initials: l.initials || l.name.split(/\s+/).map(w => w[0]).slice(0, 2).join('').toUpperCase(),
+      badgeStyle: this.badge(l.status),
+      badgeLabel: this.STATUS[l.status].label,
+    }));
+
+    const emails = [
+      { n: '1', subject: 'Your Cold-Chain Readiness Checklist is inside 👇', goal: 'Deliver the lead magnet', timing: 'Immediately', preview: 'The guide you asked for — plus the one metric most teams miss.', body: "Hi {{name}},\n\nThanks for grabbing the guide — it's attached. Inside you'll find the five shelf-stable formats we tested, ranked by transit survivability, and a printable readiness checklist.\n\nStart with page 3: it's the metric that explains most of the loss." },
+      { n: '2', subject: "The real reason cold chains fail (it isn't the freezer)", goal: 'Educational value', timing: 'Day 3', preview: 'A 2-minute read on where viability is actually lost.', body: "Most teams blame the last freezer. The data points somewhere else — the handoffs between transport legs, where stock sits unrefrigerated for hours.\n\nHere's how three distributors closed that gap without new hardware." },
+      { n: '3', subject: 'How one clinic cut spoilage 40% in a quarter', goal: 'Soft pitch / case study', timing: 'Day 7', preview: 'A short case study — and a way to talk it through.', body: "When the Kisumu clinic switched to spore-based formats and a revised delivery window, spoilage dropped 40% in a single quarter.\n\nIf you're weighing something similar, reply to this email — happy to walk through what fits your setup." },
+    ];
+
+    const channels = [
+      { name: 'WordPress (blog)', detail: 'cadence.io/blog · REST API', iconPath: 'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zM3.5 12a8.5 8.5 0 0 1 .7-3.4l3.8 10.4A8.5 8.5 0 0 1 3.5 12zM12 20.5c-.8 0-1.6-.1-2.3-.3l2.5-7.2 2.5 7a8.5 8.5 0 0 1-2.7.5zm1.2-12.5c.5 0 1-.1 1-.1.5 0 .4-.7-.1-.7 0 0-1.4.1-2.3.1-.8 0-2.3-.1-2.3-.1-.5 0-.5.7 0 .7 0 0 .5.1.9.1l1.3 3.6-1.9 5.6-3.1-9.2c.5 0 1-.1 1-.1.5 0 .4-.7-.1-.7 0 0-1.4.1-2.3.1h-.6A8.5 8.5 0 0 1 12 3.5a8.5 8.5 0 0 1 6.4 2.9h-.2c-.9 0-1.5.8-1.5 1.6 0 .8.4 1.4.9 2.2.4.6.8 1.4.8 2.6 0 .8-.3 1.8-.7 3.1l-1 3.2-3.5-10.1zm5.6 1.3a8.5 8.5 0 0 1-3.2 11.4l2.6-7.5c.5-1.2.6-2.2.6-3 0-.3 0-.6-.1-.9z', iconBg: '#1E8CBE', status: 'published', label: 'Connected' },
+      { name: 'LinkedIn', detail: 'Organization page · Marketing API', iconPath: 'M6.94 5a2 2 0 1 1-4-.02 2 2 0 0 1 4 .02zM7 8.48H3V21h4zM14.32 8.48a4.16 4.16 0 0 0-3.65 1.84V8.48H7V21h4v-6.6c0-1.5.28-3 2.15-3s1.85 1.74 1.85 3.05V21h4v-7.2c0-3.5-.74-5.32-4.68-5.32z', iconBg: '#0A66C2', status: 'published', label: 'Connected' },
+      { name: 'Facebook', detail: 'Page · Graph API · token expired', iconPath: 'M24 12a12 12 0 1 0-13.9 11.9v-8.4H7v-3.5h3.1V9.4c0-3 1.8-4.7 4.5-4.7 1.3 0 2.7.24 2.7.24v3h-1.5c-1.5 0-2 .93-2 1.9v2.2h3.4l-.55 3.5h-2.9v8.4A12 12 0 0 0 24 12z', iconBg: '#1877F2', status: 'pending', label: 'Reconnect' },
+      { name: 'Instagram', detail: 'Console stub — add credentials', iconPath: 'M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.7 3.7 0 0 1-1.38-.9 3.7 3.7 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23-.06-1.27-.07-1.65-.07-4.85s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41 1.27-.06 1.65-.07 4.85-.07zM12 6.84a5.16 5.16 0 1 0 0 10.32 5.16 5.16 0 0 0 0-10.32zm0 8.51a3.35 3.35 0 1 1 0-6.7 3.35 3.35 0 0 1 0 6.7zm6.57-8.72a1.2 1.2 0 1 1-2.4 0 1.2 1.2 0 0 1 2.4 0z', iconBg: 'linear-gradient(45deg,#F58529,#DD2A7B,#8134AF)', status: 'failed', label: 'Stub' },
+    ].map(c => ({ ...c, badgeStyle: this.badge(c.status), badgeLabel: c.label }));
+
+    // run steps
+    const runSteps = this.STEP_LABELS.map((label, i) => {
+      const isDone = i < this.state.runStep;
+      const isActive = i === this.state.runStep;
+      const dotBase = 'width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none;';
+      let dotStyle, labelStyle;
+      if (isDone) { dotStyle = dotBase + 'background:var(--success)'; labelStyle = 'font-size:13.5px;font-weight:500;color:var(--ink-2)'; }
+      else if (isActive) { dotStyle = dotBase + 'background:var(--accent)'; labelStyle = 'font-size:13.5px;font-weight:700;color:var(--ink)'; }
+      else { dotStyle = dotBase + 'background:var(--border-strong)'; labelStyle = 'font-size:13.5px;font-weight:500;color:var(--muted)'; }
+      return { label, isDone, isActive, dotStyle, labelStyle };
+    });
+
+    const toast = this.state.toast ? { ...this.state.toast } : null;
+
+    return {
+      theme, accent, dryRun,
+      navItems,
+      onTrigger: () => this.triggerRun(),
+      triggerLabel: dryRun ? 'Dry run' : 'Trigger run',
+      screenTitle: t[0], screenSub: t[1],
+      isDashboard: screen === 'dashboard', isRun: screen === 'run', isContent: screen === 'content',
+      isLanding: screen === 'landing', isLeads: screen === 'leads', isCampaign: screen === 'campaign', isSettings: screen === 'settings',
+      go: { dashboard: this.go('dashboard'), content: this.go('content'), landing: this.go('landing'), leads: this.go('leads'), campaign: this.go('campaign'), settings: this.go('settings') },
+      metrics, runs, currentRun,
+      blog, socials, approvedCount,
+      onApproveAll: () => { this.setState({ cstatus: { blog: 'approved', linkedin: 'approved', facebook: 'approved', instagram: 'approved' } }); this.flash('All 4 pieces approved & locked into the registry'); },
+      leads, leadCountLabel: String(leads.length),
+      formName: this.state.form.name, formEmail: this.state.form.email,
+      onFormName: (e) => this.onFormName(e), onFormEmail: (e) => this.onFormEmail(e),
+      onSubmit: () => this.submitForm(), formError: this.state.formError, formDone: this.state.formDone, formOpen: !this.state.formDone,
+      emails, onApproveSeq: () => this.flash('Sequence approved — queued in ActiveCampaign'),
+      channels,
+      webhookUrl: 'https://api.cadence.io/hooks/run/2f9a-bi-weekly',
+      onCopyWebhook: () => this.copyWebhook(),
+      running: this.state.running, runSteps,
+      runTitle: dryRun ? 'Dry run in progress' : 'Running pipeline',
+      runMarket: 'Health & wellness · emerging markets',
+      toast,
+    };
+  }
+}
+</script>
+</body>
+</html>

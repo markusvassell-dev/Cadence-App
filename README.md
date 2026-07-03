@@ -1,102 +1,107 @@
-# Cadence — deploy-ready backend
+# Cadence — Addendum: markets, human-voice blog prompt, approval gate
 
-A bi-weekly content engine (FastAPI) that researches a fresh market pain point,
-generates guaranteed-unique SEO content for 4 platforms, captures leads into
-ActiveCampaign, and drafts a 3-email nurture sequence.
+This is an **incremental** handoff. It assumes you already have the Phase 1–5 backend
+(`backend/app/...`) and only adds what the dashboard prototype introduced after that
+backend was built:
 
-**This folder is a flat, deploy-ready copy of the backend.** The `app/` package
-sits at the folder root, so uvicorn imports `app.main:app` with no path tricks —
-which is the whole point (see "Why this layout" below).
+1. **Configurable search focus / market** — a persisted, editable list of markets the
+   operator can add, remove, and choose between (the top-bar dropdown). Today
+   `POST /hooks/run` takes a single `market` string and otherwise falls back to
+   `settings.default_market`; there is no list and no way to manage it.
+2. **Human-voice blog prompt + voice validation** — replace the current blog prompt
+   with the strict human-voice spec (em-dash limit, banned AI phrases, direct "you"),
+   and add a deterministic post-generation check that forces a regenerate when a draft
+   breaks the rules. The uniqueness engine is unchanged.
+3. **Human approval gate** — a settings flag (default ON) that makes a real run
+   generate + audit but **hold at `status='review'`**, distributing nothing until a
+   person approves the pieces and releases the run. When OFF, runs auto-publish as
+   soon as they clear the uniqueness audit (today's behavior). This is the backend for
+   the Settings → "Human approval gate" toggle and the Content review approve actions.
+4. **Reject / regenerate reason box** — rejecting a piece captures a reason (quick-pick
+   chips + free text) that gets **threaded into the regenerate prompt**, then the new
+   draft is re-run through the uniqueness engine and blog voice check. Adds
+   `POST /content/{id}/regenerate {reason}` and a `superseded` content status.
 
-## Deploy to Railway
+Two further prototype additions are **frontend-only** (no new backend — see
+`INTEGRATION.md §11`): the **run-detail approval panel** (uses the §9 endpoints) and the
+**Automation "Controls" hub + grouped sidebar** (consolidates existing controls).
 
-1. **Push this folder to GitHub.** Either make it the repository root, or keep it
-   as a subfolder and set the Railway service's **Root Directory** to it. Either
-   way, `app/` must sit at the directory Railway builds from.
-2. **Add a Postgres database** (Railway → New → Database → PostgreSQL). It exposes
-   a `DATABASE_URL` you'll reference next.
-3. **Set environment variables** on the service (Variables tab):
-   - `DATABASE_URL` — **required.** Reference the Postgres plugin's value
-     (`${{ Postgres.DATABASE_URL }}`). Without it the app crashes on startup.
-   - `ANTHROPIC_API_KEY` — required for research/content generation.
-   - Optional: `DEFAULT_MARKET`, `SEARCH_PROVIDER`, ActiveCampaign / channel keys —
-     see [`.env.example`](.env.example). Every external integration falls back to a
-     keyless stub when unset, so the app boots without them.
-4. **Initialize the schema once** (creates all tables, including `markets`, which
-   the app seeds on startup). From the Railway service shell, or locally with
-   `DATABASE_URL` pointed at the Railway database:
-   ```bash
-   python -m scripts.init_db
-   ```
-5. **Deploy.** railpack detects Python, installs `requirements.txt`, and runs the
-   start command from [`railway.toml`](railway.toml):
-   ```
-   uvicorn app.main:app --host 0.0.0.0 --port $PORT
-   ```
-6. **Verify:** `GET /health` returns `{"status":"ok"}`.
+Nothing else in the pipeline changes. The uniqueness registry, research, leads,
+campaigns, and distribution channels all stay as-is.
 
-## Why this layout (the fix)
+---
 
-Earlier deploys crash-looped with `ModuleNotFoundError: No module named 'app'`.
-The app previously lived in a `backend/` subfolder, and the Railway service's Root
-Directory pointed at `backend/`. That meant inside the container the *contents* of
-`backend/` were at `/app`, so `app/` was `/app/app` and **`/app/backend` did not
-exist** — yet the start command kept trying to reach it (`cd backend`,
-`--app-dir backend`). Every path-juggling variant missed.
+## Files in this addendum
 
-Here the `app/` package is at the deploy root, so `uvicorn app.main:app` resolves
-directly, with no `cd` and no `--app-dir`. Nothing to misalign.
+| File | What to do with it |
+|---|---|
+| `SCHEMA_additions.sql` | Append to `handoff/SCHEMA.sql`, then re-run `python -m scripts.init_db` (idempotent). Adds the `markets` table; the approval gate needs **no** schema change (it reuses `content_registry.status`/`locked_at` and `runs.status`). |
+| `markets_router.py` | Drop in as `backend/app/routers/markets.py`. |
+| `blog_voice.py` | Drop in as `backend/app/blog_voice.py`. |
+| `approvals_router.py` | Drop in as `backend/app/routers/approvals.py` (the gate release + per-piece approve endpoints). |
+| `regenerate_router.py` | Drop in as `backend/app/routers/regenerate.py` (regenerate-one-piece-with-reason endpoint). |
+| `INTEGRATION.md` | Step-by-step edits to existing files (`db.py`, `prompts.py`, `content.py`, `config.py`, `orchestrator.py`, `main.py`, `routers/hooks.py`), plus frontend wiring and tests. |
 
-Two supporting fixes are baked in:
-- `scripts/init_db.py` now applies **both** `handoff/SCHEMA.sql` and
-  `handoff/addendum/SCHEMA_additions.sql`, so the `markets` table the startup
-  seeder needs actually exists (it was missing from the base schema).
-- `Procfile` and `railway.toml` both use the same plain start command, so whichever
-  Railway honors, the result is identical.
+---
 
-## Run locally
+## Integration checklist (ordered, easiest → involved)
 
-```bash
-python3 -m venv .venv && source .venv/bin/activate
-pip install -r requirements-dev.txt
+**Markets**
+1. **Schema** — append `SCHEMA_additions.sql`, re-run `init_db`. *(trivial)*
+2. **Markets DB layer** — paste the functions from `INTEGRATION.md` §1 into `app/db.py`. *(easy)*
+3. **Markets router** — add `app/routers/markets.py`, register it in `app/main.py`, seed the default market on startup. *(easy)*
+4. **Hook uses active market** — one-line change in `routers/hooks.py` §3. *(easy)*
 
-# Postgres (any reachable instance), then point DATABASE_URL at it:
-cp .env.example .env            # edit DATABASE_URL if needed
-python -m scripts.init_db       # applies SCHEMA.sql + addendum
+**Human-voice blog**
+5. **Blog prompt** — replace `BLOG_SYSTEM` / `BLOG_USER` in `app/prompts.py`, add `BLOG_VOICE_REGENERATE_SUFFIX`. *(easy)*
+6. **Voice validation** — add `app/blog_voice.py`, wire the optional `validate` callback into `ContentService._ensure_unique` and pass it for the blog. *(medium)*
 
-uvicorn app.main:app --reload
-```
+**Approval gate**
+7. **Config flag** — add `human_approval_gate: bool = True` to `config.py` §9a. *(trivial)*
+8. **Orchestrator hold** — add the `approval_gate` param + the "hold before publish" branch to `run_pipeline` §9b. *(easy)*
+9. **Hook wiring** — resolve the gate (per-run override → setting), pass it through, and set run status `review` vs `published` §9c. *(easy)*
+10. **DB helpers** — add `get_run`, `list_run_content`, `approve_content`, `count_unapproved_content`, `get_run_generated`, `mark_run_content_published` to `app/db.py` §9d. *(easy)*
+11. **Approvals router** — add `app/routers/approvals.py`, register in `main.py` §9e. *(easy)*
 
-Trigger a run (what Karbon's webhook calls on a schedule):
+**Frontend + tests**
+12. **Frontend** — dropdown → `/markets`; Content review approve buttons → `/content/{id}/approve` + `/runs/{id}/publish`; Settings toggle → the `human_approval_gate` setting §6–§9f. *(medium)*
+13. **Tests** — markets, blog voice, and the gate hold/release paths §8, §9g. *(medium)*
 
-```bash
-curl -X POST http://localhost:8000/hooks/run \
-  -H "Content-Type: application/json" \
-  -d '{"market": "health & wellness, underdeveloped and emerging markets"}'
-# -> {"run_id": "RUN-XXXXXXXX", "status": "review"}
-```
+Steps are independent across the three features; within the gate, 7→11 are ordered.
 
-Run tests (DB-backed tests skip automatically if `DATABASE_URL` isn't set):
+---
 
-```bash
-pytest
-```
-
-## Layout
+## How the gate changes the run lifecycle
 
 ```
-app/            FastAPI service (Phases 1-5 + addendum)
-  main.py         app factory + lifespan (init_pool, seed market)
-  routers/        /hooks/run, /leads, /markets, /lead-magnet/{slug},
-                  /runs/{id}/content, /content/{id}/approve,
-                  /runs/{id}/publish, /content/{id}/regenerate
-  research.py content.py embeddings.py search.py uniqueness.py
-  activecampaign.py email_sequence.py leads.py
-  distributors.py distribution.py retry.py alerts.py blog_voice.py
-  llm.py prompts.py landing.py db.py orchestrator.py config.py
-scripts/init_db.py   applies handoff/SCHEMA.sql + addendum
-handoff/             schema + design/spec reference
-tests/               pytest suite
-requirements.txt     runtime deps         Procfile / railway.toml  start command
-.env.example         all config knobs     requirements-dev.txt     + pytest deps
+                         approval_gate = OFF (or dry_run)
+research → generate → audit ─────────────────────────────► publish → status=published
+
+                         approval_gate = ON
+research → generate → audit ──► HOLD (status=review, pieces 'pending')
+                                     │
+              person approves pieces │  POST /content/{id}/approve
+                                     ▼
+                              POST /runs/{id}/publish ──► re-audit → publish → status=published
 ```
+
+The gate never bypasses the uniqueness audit — release re-runs it before posting.
+
+---
+
+## Notes / decisions to confirm
+
+- **Single active market.** The schema enforces "at most one active" with a partial
+  unique index. If you'd rather run *every* market each cycle, iterate `list_markets()`
+  in the orchestrator instead — the prototype models a single active focus.
+- **Voice check is deterministic, no model call**, so it's free to run on every draft;
+  a non-empty problem list makes `_ensure_unique` regenerate (same loop as a collision).
+- **Gate default is ON**, matching the prototype default and the safe choice — nothing
+  posts without a click. A per-run `approval_gate` in the POST body overrides the
+  setting (e.g. a trusted automated market could pass `false`).
+- **Per-run override vs global.** `human_approval_gate` is the global default;
+  `RunRequest.approval_gate` (nullable) overrides per call. Karbon's scheduled webhook
+  can omit it and inherit the setting.
+- **Editable prompt persistence is optional** (see `INTEGRATION.md §7`): by default the
+  blog prompt and the gate flag live in code/env; add a small `app_settings` table only
+  if operators must change them live from the dashboard without a redeploy.
